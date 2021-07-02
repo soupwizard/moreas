@@ -1,0 +1,4 @@
+# first: sudo apt-get install libcairo2-dev
+# then: pip3 install -r requirements.txt
+pycairo
+gizeh
