@@ -7,16 +7,20 @@ import gizeh, random
 # initialize surface
 bg_white = (1,1,1)
 bg_black = (0,0,0)
-width  = 1280
-height = 960
+width  = 1920
+height = 1080
 surface = gizeh.Surface(width, height, bg_color=bg_black) # in pixels
 
-def make_frame(t):
-    # t is time, from 0.0 to N.0, where N is duration of movie
-    # every t, draw a new bubble
+count = 0
+std_radius = int(height/18) # pick circle size relative to image size
 
-    # figure out radius of circle
-    std_radius = int(height/20) # pick circle size relative to image size
+def make_frame(t):
+    # t is frame number
+    # number of frames is fps*duration
+    # so for a 10 second duration movie at 30fps, this is called 300 times
+    # every t, draw a new circle
+
+    # figure out radius of circle as percent of std_radius
     if t <= half_duration:
         # first half of video, circles get progressively bigger
         percent = t/half_duration
@@ -40,13 +44,17 @@ def make_frame(t):
 # make video animation
 fps = 60
 duration = 40
-half_duration = int(duration / 2)
+half_duration = round(duration / 2)
 videoclip = mpy.VideoClip(make_frame, duration=duration)
 
 # make audio clip and attach to video clip
-audioclip = mpy.AudioFileClip("emperors-army-jeremy-blake-40sec.mp3")
+audioclip = mpy.AudioFileClip("emperors-army-jeremy-blake-41sec.mp3")
 new_audioclip = mpy.CompositeAudioClip([audioclip])
 videoclip.audio = new_audioclip
+
+# audio has trailing 1 sec of silence to cover make_frame doing 1 frame too many
+# so clip back down to duration
+videoclip = videoclip.subclip(0.0, duration)
 
 # write to video file
 videoclip.write_videofile('circle_movie.mp4', fps=fps)
